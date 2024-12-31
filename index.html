@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy New Year Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f8ff;
+            color: #333;
+        }
+
+        .container {
+            margin-top: 50px;
+            padding: 20px;
+            background: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            display: inline-block;
+        }
+
+        form {
+            margin-bottom: 20px;
+        }
+
+        input,
+        select,
+        textarea {
+            padding: 10px;
+            margin: 10px 0;
+            width: calc(100% - 22px);
+            max-width: 300px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        #imageContainer {
+            display: none;
+            margin-top: 30px;
+        }
+
+        #imageContainer img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        h1,
+        h2 {
+            color: #007bff;
+        }
+
+        h2 {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Welcome to the Happy New Year Page</h1>
+        <form id="colorForm">
+            <label for="username">Enter your name:</label><br>
+            <input type="text" id="username" name="username" required><br>
+
+            <label for="bgColor">Choose a background gradient:</label><br>
+            <select id="bgColor" name="bgColor">
+                <option value="linear-gradient(to right, red, yellow)">Red to Yellow</option>
+                <option value="linear-gradient(to right, blue, purple)">Blue to Purple</option>
+                <option value="linear-gradient(to right, green, lightgreen)">Green to Light Green</option>
+                <option value="linear-gradient(to right, orange, pink)">Orange to Pink</option>
+                <option value="linear-gradient(to right, black, gray)">Black to Gray</option>
+                <option value="linear-gradient(to right, violet, indigo)">Violet to Indigo</option>
+                <option value="linear-gradient(to right, cyan, teal)">Cyan to Teal</option>
+                <option value="linear-gradient(to right, gold, brown)">Gold to Brown</option>
+                <option value="linear-gradient(to right, magenta, white)">Magenta to White</option>
+                <option value="linear-gradient(to right, lime, olive)">Lime to Olive</option>
+            </select><br>
+
+            <label for="fontColor">Choose text color:</label><br>
+            <input type="color" id="fontColor" name="fontColor" value="#ffffff"><br>
+
+            <label for="predefinedWish">Choose a predefined wish or write your own:</label><br>
+            <select id="predefinedWish">
+                <option value="">-- Choose a predefined wish --</option>
+                <option value="Wishing you a joyful and prosperous New Year!">Wishing you a joyful and prosperous New
+                    Year!</option>
+                <option value="May this New Year bring happiness and success to you.">May this New Year bring happiness
+                    and success to you.</option>
+                <option value="Cheers to a fresh start and a fantastic year ahead!">Cheers to a fresh start and a
+                    fantastic year ahead!</option>
+                <option value="Sending you warm wishes for a wonderful New Year!">Sending you warm wishes for a
+                    wonderful New Year!</option>
+            </select><br>
+
+            <textarea id="customWish" rows="3" placeholder="Write your own message here..."></textarea><br>
+
+            <button type="button" onclick="showImage()">Submit</button>
+        </form>
+
+        <div id="imageContainer">
+            <h2 id="greeting"></h2>
+            <canvas id="outputCanvas" width="600" height="400" style="border:1px solid #ccc; display:none;"></canvas>
+            <img id="generatedImage" alt="Happy New Year" style="display:none; max-width:100%; height:auto;">
+            <br>
+            <button id="downloadButton" style="display:none;" onclick="downloadImage()">Download</button>
+        </div>
+    </div>
+
+    <script>
+        function showImage() {
+            const username = document.getElementById('username').value;
+            const bgColor = document.getElementById('bgColor').value;
+            const predefinedWish = document.getElementById('predefinedWish').value;
+            const customWish = document.getElementById('customWish').value;
+
+            if (username.trim() === "") {
+                alert("Please enter your name.");
+                return;
+            }
+
+            const message = customWish.trim() !== "" ? customWish : predefinedWish;
+
+            if (message.trim() === "") {
+                alert("Please choose or write a message.");
+                return;
+            }
+
+            const canvas = document.getElementById('outputCanvas');
+            const ctx = canvas.getContext('2d');
+
+            // Set background gradient
+            const gradient = ctx.createLinearGradient(0, 0, canvas.width, 0);
+            const colors = bgColor.match(/linear-gradient\(to right, (.*), (.*)\)/);
+            if (colors) {
+                gradient.addColorStop(0, colors[1].trim());
+                gradient.addColorStop(1, colors[2].trim());
+            }
+
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Add decorative elements
+            drawDecorations(ctx, canvas);
+
+            // Add text
+            const fontColor = document.getElementById('fontColor')?.value || 'black';
+            ctx.fillStyle = fontColor;
+
+            ctx.font = "bolder 30px Arial";
+            ctx.fillText(`Happy New Year, ${username}!`, 50, 100);
+            const maxWidth = canvas.width - 100; // Restrict text within canvas width
+            wrapText(ctx, message, 50, 200, maxWidth, 30);
+
+            // Show canvas and generate downloadable image
+            const imageContainer = document.getElementById('imageContainer');
+            const generatedImage = document.getElementById('generatedImage');
+            const downloadButton = document.getElementById('downloadButton');
+
+            imageContainer.style.display = 'block';
+            const dataURL = canvas.toDataURL();
+            generatedImage.src = dataURL;
+            generatedImage.style.display = 'block';
+            downloadButton.style.display = 'inline-block';
+        }
+
+        function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
+            const words = text.split(' ');
+            let line = '';
+
+            for (let n = 0; n < words.length; n++) {
+                const testLine = line + words[n] + ' ';
+                const metrics = ctx.measureText(testLine);
+                const testWidth = metrics.width;
+                if (testWidth > maxWidth && n > 0) {
+                    ctx.fillText(line, x, y);
+                    line = words[n] + ' ';
+                    y += lineHeight;
+                } else {
+                    line = testLine;
+                }
+            }
+            ctx.fillText(line, x, y);
+        }
+
+        function drawDecorations(ctx, canvas) {
+            // Draw confetti
+            for (let i = 0; i < 100; i++) {
+                const x = Math.random() * canvas.width;
+                const y = Math.random() * canvas.height;
+                const size = Math.random() * 5 + 2;
+                const color = `hsl(${Math.random() * 360}, 100%, 50%)`;
+                ctx.fillStyle = color;
+                ctx.beginPath();
+                ctx.arc(x, y, size, 0, 2 * Math.PI);
+                ctx.fill();
+            }
+
+            // Draw flower-like shapes
+            for (let i = 0; i < 10; i++) {
+                const x = Math.random() * canvas.width;
+                const y = Math.random() * canvas.height;
+                drawFlower(ctx, x, y);
+            }
+        }
+
+        function drawFlower(ctx, x, y) {
+            const petalCount = 6;
+            const radius = 20;
+            const petalColor = `hsl(${Math.random() * 360}, 70%, 70%)`;
+
+            ctx.fillStyle = petalColor;
+            for (let i = 0; i < petalCount; i++) {
+                const angle = (i * 2 * Math.PI) / petalCount;
+                const petalX = x + radius * Math.cos(angle);
+                const petalY = y + radius * Math.sin(angle);
+                ctx.beginPath();
+                ctx.arc(petalX, petalY, radius / 2, 0, 2 * Math.PI);
+                ctx.fill();
+            }
+
+            // Draw center
+            ctx.fillStyle = "yellow";
+            ctx.beginPath();
+            ctx.arc(x, y, radius / 2, 0, 2 * Math.PI);
+            ctx.fill();
+        }
+
+        function downloadImage() {
+            const generatedImage = document.getElementById('generatedImage');
+            const link = document.createElement('a');
+            link.href = generatedImage.src;
+            link.download = 'HappyNewYear.png';
+            link.click();
+        }
+    </script>
+</body>
+
+</html>
