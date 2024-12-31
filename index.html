@@ -100,6 +100,15 @@
             <label for="fontColor">Choose text color:</label><br>
             <input type="color" id="fontColor" name="fontColor" value="#ffffff"><br>
 
+            <label for="designStyle">Choose Design:</label><br>
+            <select id="designStyle">
+                <option value="confetti">Confetti</option>
+                <option value="stars">Stars</option>
+                <option value="fireworks">Fireworks</option>
+                <option value="abstract">Abstract Patterns</option>
+            </select><br>
+
+
             <label for="predefinedWish">Choose a predefined wish or write your own:</label><br>
             <select id="predefinedWish">
                 <option value="">-- Choose a predefined wish --</option>
@@ -124,7 +133,7 @@
             <img id="generatedImage" alt="Happy New Year" style="display:none; max-width:100%; height:auto;">
             <br>
             <button id="downloadButton" style="display:none;" onclick="downloadImage()">Download</button>
-        </div>
+        </div><br>
         <footer>
             <a href="https://bhavy-sharma.github.io/protfolio/" style="text-decoration: underline;">Code With Bhavy</a>
         </footer>
@@ -207,7 +216,27 @@
         }
 
         function drawDecorations(ctx, canvas) {
-            // Draw confetti
+            const designStyle = document.getElementById('designStyle').value;
+
+            switch (designStyle) {
+                case "confetti":
+                    drawConfetti(ctx, canvas);
+                    break;
+                case "stars":
+                    drawStars(ctx, canvas);
+                    break;
+                case "fireworks":
+                    drawFireworks(ctx, canvas);
+                    break;
+                case "abstract":
+                    drawAbstractPatterns(ctx, canvas);
+                    break;
+                default:
+                    drawConfetti(ctx, canvas); // Default design
+            }
+        }
+
+        function drawConfetti(ctx, canvas) {
             for (let i = 0; i < 100; i++) {
                 const x = Math.random() * canvas.width;
                 const y = Math.random() * canvas.height;
@@ -218,35 +247,49 @@
                 ctx.arc(x, y, size, 0, 2 * Math.PI);
                 ctx.fill();
             }
+        }
 
-            // Draw flower-like shapes
-            for (let i = 0; i < 10; i++) {
+        function drawStars(ctx, canvas) {
+            for (let i = 0; i < 50; i++) {
                 const x = Math.random() * canvas.width;
                 const y = Math.random() * canvas.height;
-                drawFlower(ctx, x, y);
+                const size = Math.random() * 3 + 1;
+                ctx.fillStyle = "white";
+                ctx.beginPath();
+                ctx.arc(x, y, size, 0, 2 * Math.PI);
+                ctx.fill();
             }
         }
 
-        function drawFlower(ctx, x, y) {
-            const petalCount = 6;
-            const radius = 20;
-            const petalColor = `hsl(${Math.random() * 360}, 70%, 70%)`;
+        function drawFireworks(ctx, canvas) {
+            for (let i = 0; i < 10; i++) {
+                const centerX = Math.random() * canvas.width;
+                const centerY = Math.random() * canvas.height;
+                for (let j = 0; j < 50; j++) {
+                    const angle = (Math.random() * 2 * Math.PI);
+                    const radius = Math.random() * 50;
+                    const x = centerX + radius * Math.cos(angle);
+                    const y = centerY + radius * Math.sin(angle);
+                    ctx.fillStyle = `hsl(${Math.random() * 360}, 70%, 70%)`;
+                    ctx.beginPath();
+                    ctx.arc(x, y, 2, 0, 2 * Math.PI);
+                    ctx.fill();
+                }
+            }
+        }
 
-            ctx.fillStyle = petalColor;
-            for (let i = 0; i < petalCount; i++) {
-                const angle = (i * 2 * Math.PI) / petalCount;
-                const petalX = x + radius * Math.cos(angle);
-                const petalY = y + radius * Math.sin(angle);
+        function drawAbstractPatterns(ctx, canvas) {
+            for (let i = 0; i < 20; i++) {
+                const x = Math.random() * canvas.width;
+                const y = Math.random() * canvas.height;
+                const width = Math.random() * 100 + 50;
+                const height = Math.random() * 100 + 50;
+                const color = `hsl(${Math.random() * 360}, 70%, 70%)`;
+                ctx.fillStyle = color;
                 ctx.beginPath();
-                ctx.arc(petalX, petalY, radius / 2, 0, 2 * Math.PI);
+                ctx.rect(x, y, width, height);
                 ctx.fill();
             }
-
-            // Draw center
-            ctx.fillStyle = "yellow";
-            ctx.beginPath();
-            ctx.arc(x, y, radius / 2, 0, 2 * Math.PI);
-            ctx.fill();
         }
 
         function downloadImage() {
@@ -258,7 +301,7 @@
         }
     </script>
 
-    
+
 </body>
 
 </html>
